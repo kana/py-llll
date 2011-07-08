@@ -411,18 +411,6 @@ def order_by(xs, key_from_x):
 
 # TODO: OrderByDescending
 
-@queryize
-def reverse(xs):
-  '''
-  >>> range(10) | reverse() | to_tuple()
-  (9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-  >>> [1] | reverse() | to_tuple()
-  (1,)
-  >>> [] | reverse() | to_tuple()
-  ()
-  '''
-  return reversed(xs | to_list())
-
 def repeat(x, n = None):
   '''
   >>> repeat(1, 3) | to_tuple()
@@ -438,6 +426,18 @@ def repeat(x, n = None):
       yield x
 
 @queryize
+def reverse(xs):
+  '''
+  >>> range(10) | reverse() | to_tuple()
+  (9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+  >>> [1] | reverse() | to_tuple()
+  (1,)
+  >>> [] | reverse() | to_tuple()
+  ()
+  '''
+  return reversed(xs | to_list())
+
+@queryize
 def select(xs, y_from_x):
   '''
   >>> range(10) | select(lambda x: x * x) | to_tuple()
@@ -445,17 +445,6 @@ def select(xs, y_from_x):
   '''
   for x in xs:
     yield y_from_x(x)
-
-@queryize
-def select_with_index(xs, y_from_x_i):
-  '''
-  >>> [3, 2, 1] | select_with_index(lambda x, i: x * i) | to_tuple()
-  (0, 2, 2)
-  '''
-  i = 0
-  for x in xs:
-    yield y_from_x_i(x, i)
-    i += 1
 
 @queryize
 def select_many(xs, ys_from_x):
@@ -477,6 +466,17 @@ def select_many_with_index(xs, ys_from_x_i):
   for x in xs:
     for y in ys_from_x_i(x, i):
       yield y
+    i += 1
+
+@queryize
+def select_with_index(xs, y_from_x_i):
+  '''
+  >>> [3, 2, 1] | select_with_index(lambda x, i: x * i) | to_tuple()
+  (0, 2, 2)
+  '''
+  i = 0
+  for x in xs:
+    yield y_from_x_i(x, i)
     i += 1
 
 # TODO: SequenceEqual
