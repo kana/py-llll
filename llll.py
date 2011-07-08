@@ -332,6 +332,12 @@ def first_or_default(xs, default_value, predicate = lambda x: True):
       return x
   return default_value
 
+# TODO: GroupBy
+
+# TODO: Intersect
+
+# TODO: Join
+
 @queryize
 def last(xs, predicate = lambda x: True):
   '''
@@ -403,6 +409,8 @@ def order_by(xs, key_from_x):
   '''
   return OrderedSequence(xs, key_from_x)
 
+# TODO: OrderByDescending
+
 @queryize
 def reverse(xs):
   '''
@@ -470,6 +478,8 @@ def select_many_with_index(xs, ys_from_x_i):
     for y in ys_from_x_i(x, i):
       yield y
     i += 1
+
+# TODO: SequenceEqual
 
 @queryize
 def single(xs, predicate = lambda x: True):
@@ -658,6 +668,8 @@ def then_by(ordered_xs, key_from_x):
   else:
     raise ValueError('Sequence must be sorted with order_by')
 
+# TODO: ThenByDescending
+
 @queryize
 def to_dict(xs, key_from_x, value_from_x = lambda x: x):
   '''
@@ -742,6 +754,8 @@ def to_tuple(xs):
   '''
   return tuple(xs)
 
+# TODO: Union
+
 @queryize
 def where(xs, predicate):
   '''
@@ -763,6 +777,8 @@ def where_with_index(xs, predicate_with_index):
     if predicate_with_index(x, i):
       yield x
     i += 1
+
+# TODO: Zip
 
 
 
