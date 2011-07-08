@@ -561,6 +561,42 @@ def take_while_with_index(xs, predicate_with_index):
     i += 1
 
 @queryize
+def to_dict(xs, key_from_x, value_from_x = lambda x: x):
+  '''
+  >>> d = ['apple', 'banana', 'cherry'] | to_dict(lambda x: x[0])
+  >>> d['a']
+  'apple'
+  >>> d['b']
+  'banana'
+  >>> d['c']
+  'cherry'
+  >>> len(d.keys())
+  3
+  >>> d = ['ada', 'basic', 'cl'] | to_dict(lambda x: x[0], lambda x: len(x))
+  >>> d['a']
+  3
+  >>> d['b']
+  5
+  >>> d['c']
+  2
+  >>> len(d.keys())
+  3
+  >>> d = ['ada', 'basic', 'csp'] | to_dict(lambda x: len(x), lambda x: x)
+  Traceback (most recent call last):
+    ...
+  LookupError: Key 3 (for 'csp') is duplicate
+  '''
+  d = {}
+  for x in xs:
+    k = key_from_x(x)
+    v = value_from_x(x)
+    if k in d:
+      raise LookupError('Key %r (for %r) is duplicate' % (k, x))
+    else:
+      d[k] = v
+  return d
+
+@queryize
 def to_list(xs):
   '''
   >>> range(10) | to_list()
