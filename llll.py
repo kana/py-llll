@@ -747,6 +747,14 @@ def to_lookup(xs, key_from_x, value_from_x = lambda x: x):
   return d
 
 @queryize
+def to_set(xs):
+  '''
+  >>> range(10) | to_set()
+  set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  '''
+  return set(xs)
+
+@queryize
 def to_tuple(xs):
   '''
   >>> range(10) | to_tuple()
