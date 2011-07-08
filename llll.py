@@ -54,6 +54,52 @@ class OrderedSequence:
 
 
 @queryize
+def aggregate(xs, seed, a_from_a_x, y_from_a = lambda a: a):
+  '''
+  >>> import string
+  >>> u = string.upper
+  >>> cat = lambda a, x: a + ':' + x
+  >>> ['a', 'b', 'c'] | aggregate('z', cat)
+  'z:a:b:c'
+  >>> ['a'] | aggregate('z', cat)
+  'z:a'
+  >>> [] | aggregate('z', cat)
+  'z'
+  >>> ['a', 'b', 'c'] | aggregate('z', cat, u)
+  'Z:A:B:C'
+  >>> ['a'] | aggregate('z', cat, u)
+  'Z:A'
+  >>> [] | aggregate('z', cat, u)
+  'Z'
+  '''
+  a = seed
+  for x in xs:
+    a = a_from_a_x(a, x)
+  return y_from_a(a)
+
+@queryize
+def aggregate1(xs, a_from_a_x):
+  # TODO: Think about more proper name.
+  '''
+  >>> cat = lambda a, x: a + ':' + x
+  >>> ['a', 'b', 'c'] | aggregate1(cat)
+  'a:b:c'
+  >>> ['a'] | aggregate1(cat)
+  'a'
+  >>> [] | aggregate1(cat)
+  Traceback (most recent call last):
+    ...
+  ValueError: Sequence must contain some element
+  '''
+  xsd = (x for x in xs)
+  try:
+    a = xsd.next()
+  except StopIteration:
+    raise ValueError('Sequence must contain some element')
+
+  return xsd | aggregate(a, a_from_a_x)
+
+@queryize
 def all(xs, predicate):
   '''
   >>> [1, 2, 3] | all(lambda x: isinstance(x, int))
