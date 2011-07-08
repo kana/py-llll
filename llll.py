@@ -605,6 +605,38 @@ def to_list(xs):
   return list(xs)
 
 @queryize
+def to_lookup(xs, key_from_x, value_from_x = lambda x: x):
+  '''
+  >>> d = ['ada', 'awk', 'bash', 'bcpl', 'c'] | to_lookup(lambda x: x[0])
+  >>> d['a'] | to_tuple()
+  ('ada', 'awk')
+  >>> d['b'] | to_tuple()
+  ('bash', 'bcpl')
+  >>> d['c'] | to_tuple()
+  ('c',)
+  >>> len(d.keys())
+  3
+  >>> d = ['ada', 'awk', 'bash', 'bcpl', 'c'] | to_lookup(lambda x: x[0], len)
+  >>> d['a'] | to_tuple()
+  (3, 3)
+  >>> d['b'] | to_tuple()
+  (4, 4)
+  >>> d['c'] | to_tuple()
+  (1,)
+  >>> len(d.keys())
+  3
+  '''
+  d = {}
+  for x in xs:
+    k = key_from_x(x)
+    v = value_from_x(x)
+    if k in d:
+      d[k].append(v)
+    else:
+      d[k] = [v]
+  return d
+
+@queryize
 def to_tuple(xs):
   '''
   >>> range(10) | to_tuple()
