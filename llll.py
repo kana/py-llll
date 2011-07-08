@@ -38,6 +38,18 @@ def queryize(original_query):
   wrapped_query.__doc__ = original_query.__doc__
   return wrapped_query
 
+class OrderedSequence:
+  def __init__(self, xs, key_from_x):
+    self.xs = xs
+    self.key_from_x = key_from_x
+    return
+
+  def __iter__(self):
+    xsd = self.xs | to_list()
+    xsd.sort(key = self.key_from_x)
+    for x in xsd:
+      yield x
+
 
 
 
@@ -338,6 +350,14 @@ def min(xs, y_from_x = lambda x: x):
   return __builtins__.min(y_from_x(x) for x in xs)
 
 @queryize
+def order_by(xs, key_from_x):
+  '''
+  >>> range(10) | order_by(lambda x: -x) | to_tuple()
+  (9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+  '''
+  return OrderedSequence(xs, key_from_x)
+
+@queryize
 def reverse(xs):
   '''
   >>> range(10) | reverse() | to_tuple()
@@ -559,6 +579,38 @@ def take_while_with_index(xs, predicate_with_index):
     else:
       break
     i += 1
+
+@queryize
+def then_by(ordered_xs, key_from_x):
+  '''
+  >>> (range(10)
+  ...  | order_by(lambda x: x % 2)
+  ...  | to_tuple())
+  (0, 2, 4, 6, 8, 1, 3, 5, 7, 9)
+  >>> (range(10)
+  ...  | order_by(lambda x: x % 2)
+  ...  | order_by(lambda x: -x)
+  ...  | to_tuple())
+  (9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+  >>> (range(10)
+  ...  | order_by(lambda x: x % 2)
+  ...  | then_by(lambda x: -x)
+  ...  | to_tuple())
+  (8, 6, 4, 2, 0, 9, 7, 5, 3, 1)
+  >>> (range(10)                         # (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+  ...  | order_by(lambda x: x % 2)       # (0, 2, 4, 6, 8, 1, 3, 5, 7, 9)
+  ...                                    #  -------------  -------------
+  ...  | then_by(lambda x: x % 4 != 0)   # (0, 4, 8, 2, 6, 1, 3, 5, 7, 9)
+  ...                                    #  -------  ----  -------------
+  ...  | then_by(lambda x: -x)
+  ...  | to_tuple())
+  (8, 4, 0, 6, 2, 9, 7, 5, 3, 1)
+  '''
+  if isinstance(ordered_xs, OrderedSequence):
+    return OrderedSequence(ordered_xs.xs,
+                           lambda x: (ordered_xs.key_from_x(x), key_from_x(x)))
+  else:
+    raise ValueError('Sequence must be sorted with order_by')
 
 @queryize
 def to_dict(xs, key_from_x, value_from_x = lambda x: x):
